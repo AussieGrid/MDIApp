@@ -13,8 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/phase_state.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="573">
-              <caret line="175" column="79" selection-start-line="175" selection-start-column="79" selection-end-line="175" selection-end-column="79" />
+            <state relative-caret-position="556">
+              <caret line="218" column="8" selection-start-line="218" selection-start-column="8" selection-end-line="218" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -49,7 +49,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Course" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -61,6 +60,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Course" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -110,8 +110,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/phase_state.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="573">
-          <caret line="175" column="79" selection-start-line="175" selection-start-column="79" selection-end-line="175" selection-end-column="79" />
+        <state relative-caret-position="556">
+          <caret line="218" column="8" selection-start-line="218" selection-start-column="8" selection-end-line="218" selection-end-column="8" />
         </state>
       </provider>
     </entry>

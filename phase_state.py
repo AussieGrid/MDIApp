@@ -6,7 +6,7 @@ import math
 
 class PhaseState:
 
-    def __init__(self, temperature, pressure, mol_flow_initial, mol_frac_initial, pressure_crit, temperature_crit, omega, ro, mr, additional_parameters):
+    def __init__(self, temperature, pressure, mol_flow_initial, mol_frac_initial, pressure_crit, temperature_crit, omega, density, molmass, additional_parameters):
 
         _gas_molar_flow = 0  # molar flow of gaseous products, mol./h {G}
         _liquid_molar_flow = 0  # molar flow of liquid products, mol./h {L}
@@ -21,9 +21,9 @@ class PhaseState:
         if _num_of_components != len(pressure_crit) or _num_of_components != len(temperature_crit) or _num_of_components != len(omega):
             pass  # Here must error message raise, but idk how to do it yet
 
-        _mol_frac_initial = mol_frac_initial.copy()  # molar fractions of components in flow of feed, %
-        _mol_frac_liquid = []  # molar fractions of components in flow of liquid products, %
-        _mol_frac_gaseous = []  # molar fractions of components in flow of gaseous products, %
+        _mol_frac_initial = mol_frac_initial.copy()  # molar fractions of components in flow of feed, % {zF}
+        _mol_frac_liquid = []  # molar fractions of components in flow of liquid products, % {xL}
+        _mol_frac_gaseous = []  # molar fractions of components in flow of gaseous products, % {yG}
         """ for i in range(_num_of_components):
                 _mol_frac_liquid.append(0)
                 _mol_frac_gaseous.append(0) """
@@ -31,8 +31,8 @@ class PhaseState:
         _pressure_crit = pressure_crit.copy()  # critical pressures of each components, Pa {Pc}
         _temperature_crit = temperature_crit.copy()  # critical temperatures of each components, C {Tc}
         _omega = omega.copy()  # some acentric factors of components ???
-        _ro = ro.copy()  # some acentric factors of components ???
-        _mr = mr.copy()  # some acentric factors of components ???
+        _density = density.copy()  # density of components, kg/m3 {ro}
+        _molmass = molmass.copy()  # molecular masses of components, g/mol. {Mr}
 
         _parameters_coef = dict.fromkeys(['aTFP', 'bTFP'])  # {ParamKoef}
         if additional_parameters[0] > -1:  # reloading of parameters {Param}
@@ -88,7 +88,7 @@ class PhaseState:
     def raschford_rice(self, fc):
         """
         Calculation of the mole fraction of distillate using Raschford-Rice equation
-        :param fc:
+        :param fc: the value is gathered from phase_selector
         """
 
         _fc = fc
@@ -174,3 +174,48 @@ class PhaseState:
 
         self._gas_molar_flow = self._mol_flow_initial * self._cut_molar
         self._liquid_molar_flow = self._mol_flow_initial - self._gas_molar_flow
+
+    def get_cut_value(self, _e):
+        """
+
+        :param _e: cut_molar
+        :return:
+        """
+
+        if (_e == 0) or (_e == 1):
+            return _e
+
+        _avg_molmass_initial = 0  # average molecular mass of the components in feed stream {MrsrF}
+        _avg_molmass_liquid = 0  # average molecular mass of the components in liquid products stream {MrsrL}
+        _avg_molmass_gaseuos = 0  # average molecular mass of the components in gas products stream {MrsrG}
+
+        for i in range(len(self._mol_frac_initial)):
+            _avg_molmass_initial += self._mol_frac_initial[i] * self._molmass[i]
+            _avg_molmass_liquid += self._mol_frac_liquid[i] * self._molmass[i]
+            _avg_molmass_gaseuos += self._mol_frac_gaseuos[i] * self._molmass[i]
+
+        if _avg_molmass_liquid == 0:
+            _avg_molmass_liquid = _avg_molmass_initial
+        if _avg_molmass_gaseuos == 0:
+            _avg_molmass_gaseuos = _avg_molmass_initial
+
+        _density_initial = 0
+        _density_liquid = 0
+        _density_gaseuos = 0
+
+        for i in range(len(self._mol_frac_initial)):
+            _density_initial += self._mol_frac_initial[i] * self._molmass[i] / (self._density[i] * _avg_molmass_initial)
+            _density_liquid += self._mol_frac_liquid[i] * self._molmass[i] / (self._density[i] * _avg_molmass_liquid)
+            _density_gaseuos += self._mol_frac_gaseuos[i] * self._molmass[i] / (self._density[i] * _avg_molmass_gaseuos)
+
+        _density_initial = 1 / _density_initial
+        _density_liquid = 1 / _density_liquid
+        _density_gaseuos = 1 / _density_gaseuos
+
+        return _e * _density_initial * _avg_molmass_gaseuos / (_density_gaseuos * _avg_molmass_initial)
+
+    def get_temp_from_procent(self):
+        """
+        
+        :return:
+        """
